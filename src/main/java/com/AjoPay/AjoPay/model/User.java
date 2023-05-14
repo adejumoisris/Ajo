@@ -22,7 +22,7 @@ public class User extends BaseModel {
     private String lastName;
 
     private String email;
-    private Integer phoneNumber;
+    private int phoneNumber;
 
     private String password;
 
