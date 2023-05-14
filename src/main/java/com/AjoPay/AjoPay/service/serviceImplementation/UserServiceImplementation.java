@@ -1,5 +1,6 @@
 package com.AjoPay.AjoPay.service.serviceImplementation;
 
+import com.AjoPay.AjoPay.exceptions.UserNotFoundException;
 import com.AjoPay.AjoPay.model.User;
 import com.AjoPay.AjoPay.repository.UserRepo;
 import com.AjoPay.AjoPay.service.UserService;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -26,8 +28,14 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public User fetUserById(Long userId) {
-        return userRepo.findById(userId).get();
+    public User fetUserById(Long userId) throws UserNotFoundException {
+        Optional<User> user =  userRepo.findById(userId);
+        // if user is not present throw this exception
+        if(!user.isPresent()){
+            throw new UserNotFoundException(" User not found");
+        }
+        // if usser is present throw this value
+        return user.get();
     }
 
     @Override
