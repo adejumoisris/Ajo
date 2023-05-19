@@ -1,70 +1,80 @@
 package com.AjoPay.AjoPay.controller;
 
 import com.AjoPay.AjoPay.dto.request.UserRequestDto;
+import com.AjoPay.AjoPay.dto.response.ApiResponse;
+import com.AjoPay.AjoPay.dto.response.UserResponse;
 import com.AjoPay.AjoPay.exceptions.UserNotFoundException;
 import com.AjoPay.AjoPay.model.User;
 import com.AjoPay.AjoPay.service.UserService;
-import com.AjoPay.AjoPay.service.serviceImplementation.UserServiceImplementation;
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URL;
 import java.util.List;
-
+@Slf4j
 @RestController
 public class UserController {
     @Autowired
     private UserService userService;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-    // save User
-    @PostMapping("/users")
-    public User saveUser(@Valid @RequestBody User user){
-        LOGGER.info(  "save inside the saveController");
-        return userService.saveUser(user);
+    @PostMapping(path = "/signup")
+    public ResponseEntity<ApiResponse<UserResponse>> createAccount(@RequestBody UserRequestDto request){
+        log.info("create user call for first name: {}", request.getFirstName());
+        UserResponse response = userService.createUser(request);
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setData(response);
+        apiResponse.setStatusCode("00");
+        apiResponse.setMessage("creat user Successfully");
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
-
     // get All the user in databases
 
     @GetMapping("/users")
     public List<User> fetAllUsers(){
-        LOGGER.info(  "fectALLUsers inside the saveController");
+
         return userService.fetAllUsers();
 
     }
 
     // fecth Data by Id
 
-    @GetMapping("/users{id}")
-    public User fetUserById(@PathVariable("id") Long userId) throws UserNotFoundException {
-        return userService.fetUserById(userId);
+    @GetMapping(path = "{userId}/user")
+    public ResponseEntity<Object> fetchUserById (@PathVariable Long userId){
+        UserResponse foundUser = userService.fetchUserById(userId);
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setData(foundUser);
+        apiResponse.setStatusCode("00");
+        apiResponse.setMessage("fetch User");
+        return ResponseEntity.status(200).body(apiResponse);
     }
 
     // delete data by Id
-    @DeleteMapping("/users{id}")
-    public String deleteUserById(@PathVariable("id")  Long userId){
-         userService.deleteUserById(userId);
-        return "user delete Successfully";
+    @DeleteMapping("/{userId}/user")
+    public ResponseEntity<Object> deleteUserById(@PathVariable Long userId){
+        userService.deleteUserById(userId);
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setData("user deleted");
+        apiResponse.setStatusCode("00");
+        return ResponseEntity.status(202).body(apiResponse);
     }
+
 
     // update data in the database
-    @PutMapping("users{id}")
-    public User UpdateUser(@PathVariable("id") Long userId, @RequestBody User user){
-        return userService.UpdateUser(userId, user);
+    @PutMapping(path = "{userId}/user")
+    public ResponseEntity<Object> UpdateUserById(@PathVariable Long userId, @RequestBody UserRequestDto request){
+        UserResponse response = userService.UpdateUserById(userId , request);
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setData(response);
+        apiResponse.setStatusCode("00");
+        apiResponse.setMessage("updates successfully");
+        return ResponseEntity.status(202).body(apiResponse);
+
     }
+
 
     // fetch user by firstName
-    @GetMapping("users/firstName{firstName}")
-    public User fetchByFirstName(@PathVariable("firstName ") String firstName){
 
-        return userService.fetchByFirstName(firstName);
-    }
 
 }

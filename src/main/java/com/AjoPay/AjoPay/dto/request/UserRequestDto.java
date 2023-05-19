@@ -14,6 +14,8 @@ public class UserRequestDto {
     private String lastName;
     @Email(message = "invalid Email, please check input")
     private String email;
+    private String password;
+    private String gender;
     @Min(11)
     @Max(11)
     private Integer phoneNumber;
