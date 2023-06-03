@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @Slf4j
 @RestController
+@RequestMapping(path = "/user")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -25,8 +26,8 @@ public class UserController {
         UserResponse response = userService.createUser(request);
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(response);
-        apiResponse.setStatusCode("00");
-        apiResponse.setMessage("creat user Successfully");
+        apiResponse.setStatusCode("200");
+        apiResponse.setMessage("create user Successfully");
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
     // get All the user in databases

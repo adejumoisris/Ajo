@@ -30,6 +30,8 @@ public class User extends BaseModel {
 
     private String gender;
 
+    private String role;
+
     // Auditing
 
     @Override
