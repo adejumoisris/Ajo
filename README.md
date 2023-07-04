@@ -1,6 +1,7 @@
 # Ajo
-Ajo is a communal saving platform where you can save money with a group of like-minded, anytime any day
+Ajo is a community-saving platform that allows you to save money with a group of like-minded people at any time of day or night. Our mission is to help people save for things like business startup capital, home ownership, college tuition, a new automobile, and vacations.
 
+# Architecutre Overview
 The application will be hosted on the AWS cloud and deployed with three-tier architecture. With this approach, we would achieve scalability, reliability, and maintainability. The three-tier architecture consists of three layers: 
 * Presentation layer
 * Application layer 
@@ -20,3 +21,14 @@ The application layer contains the core business logic and handles user requests
 
 #### 3. Data Layer:
 The data layer stores and manages the application's data. The app uses MySQL as the relational database and would use Amazon S3 for object storage and file hosting
+
+### Architecutral Diagram
+![image](https://github.com/adejumoisris/Ajo/assets/6795541/e2e3089e-d28c-47e3-babb-01b73fe38af4)
+
+
+#### Technology: 
+~~~
+Frontend: HTML, CSS, JavaScript ....
+Backend: Java, JavaSpring boot ....
+Database: MySQL
+~~~
