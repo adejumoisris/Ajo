@@ -8,17 +8,20 @@ import lombok.Value;
 @Data
 @Builder
 public class UserRequestDto {
-    @NotBlank(message = "firstname is required")
+
+//    @NotBlank(message = "firstname is required")
     private String firstName;
-    @NotBlank(message = "lastName is required")
+//    @NotBlank(message = "lastName is required")
+     private String username;
     private String lastName;
-    @Email(message = "invalid Email, please check input")
+//    @Email(message = "invalid Email, please check input")
     private String email;
     private String password;
     private String gender;
-    @Min(11)
-    @Max(11)
-    private Integer phoneNumber;
+//    @Min(11)
+//    @Max(11)
+    private String phoneNumber;
+    private String role;
 
 //    private String password;
 //

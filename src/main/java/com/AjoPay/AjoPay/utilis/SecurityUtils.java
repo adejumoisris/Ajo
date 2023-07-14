@@ -1,6 +1,6 @@
 package com.AjoPay.AjoPay.utilis;
 
-import com.AjoPay.AjoPay.constants.SecurityConstant;
+import com.AjoPay.AjoPay.constant.SecurityConstants;
 import com.AjoPay.AjoPay.dto.response.TokenResponse;
 import com.AjoPay.AjoPay.exceptions.CustomException;
 import com.auth0.jwt.JWT;
@@ -22,43 +22,41 @@ import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
 
-public class AppUtilis {
-    // generate token
+public class SecurityUtils {
     public static TokenResponse generateToken(Authentication authentication){
-        User user= (User) authentication.getPrincipal();
+        User user  = (User) authentication.getPrincipal();
 
-        String userName = user.getUsername(); // geting UserName
-        Algorithm algorithm = Algorithm.HMAC256(SecurityConstant.SECRET.getBytes());
-         String access_token = JWT.create()// generating an access token
-                 .withSubject(userName)
-                 .withExpiresAt(new Date(System.currentTimeMillis()+SecurityConstant.EXPIRATION_TIME))
-                 .withIssuedAt(new Date(System.currentTimeMillis()))
-                 .withClaim("roles", authentication.getAuthorities()
-                         .stream()
-                         .map(GrantedAuthority :: getAuthority)
-                         .collect(Collectors.toList())
+        String userName = user.getUsername();
 
-                 ).sign(algorithm);
-         return new TokenResponse(access_token);
+        Algorithm algorithm = Algorithm.HMAC256(SecurityConstants.SECRET.getBytes());
+        String access_token = JWT.create()
+                .withSubject(userName)
+                .withExpiresAt(new Date(System.currentTimeMillis()+ SecurityConstants.EXPIRATION_TIME))
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withClaim("roles", authentication.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())
+                ).sign(algorithm);
+        return new TokenResponse(access_token);
     }
 
-    // verify token
+    // verifyToken use to access endpoint
 
     public static UsernamePasswordAuthenticationToken verifyToken(String token){
         try {
-            Algorithm algorithm = Algorithm.HMAC256(SecurityConstant.SECRET.getBytes());
-            JWTVerifier Verify = JWT.require(algorithm).build();
-            DecodedJWT decodedJWT = Verify.verify(token);
+            Algorithm algorithm = Algorithm.HMAC256(SecurityConstants.SECRET.getBytes());
+            JWTVerifier verify = JWT.require(algorithm).build();
+            DecodedJWT decodedJWT = verify.verify(token);
             String username = decodedJWT.getSubject();
             String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
             Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            stream(roles).forEach(role ->{
+            stream(roles).forEach(role->{
                 authorities.add(new SimpleGrantedAuthority(role));
             });
-            return new UsernamePasswordAuthenticationToken(username,null, authorities);
-
+            return new UsernamePasswordAuthenticationToken(username, null, authorities);
         }catch (Exception exception){
-            throw new CustomException("Unthorized", HttpStatus.UNAUTHORIZED);
+            throw new CustomException("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
     }
 }

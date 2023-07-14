@@ -6,19 +6,22 @@ import com.AjoPay.AjoPay.dto.response.UserResponse;
 import com.AjoPay.AjoPay.exceptions.UserNotFoundException;
 import com.AjoPay.AjoPay.model.User;
 import com.AjoPay.AjoPay.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(path = "/user")
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
 
     @PostMapping(path = "/signup")
     public ResponseEntity<ApiResponse<UserResponse>> createAccount(@RequestBody UserRequestDto request){
@@ -26,9 +29,26 @@ public class UserController {
         UserResponse response = userService.createUser(request);
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(response);
-        apiResponse.setStatusCode("200");
+        apiResponse.setStatusCode(true);
         apiResponse.setMessage("create user Successfully");
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
+
+    // <<<<<<<<-------------------Verify Token --------------------------------->>>>>>>>>
+    @GetMapping(path = "verify-account", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse<String>> verifyAccount (@PathVariable String token ){
+        log.info("inside verifyAccount endpoint ");
+        String response = userService.verifyAccount(token);
+
+        return ResponseEntity.ok().body(ApiResponse.<String>builder()
+                .isSuccessful(true)
+                .data(response)
+                .build()
+
+
+        );
+
     }
     // get All the user in databases
 
@@ -46,7 +66,7 @@ public class UserController {
         UserResponse foundUser = userService.fetchUserById(userId);
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(foundUser);
-        apiResponse.setStatusCode("00");
+        apiResponse.setStatusCode(true);
         apiResponse.setMessage("fetch User");
         return ResponseEntity.status(200).body(apiResponse);
     }
@@ -57,7 +77,7 @@ public class UserController {
         userService.deleteUserById(userId);
         ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setData("user deleted");
-        apiResponse.setStatusCode("00");
+        apiResponse.setStatusCode(true);
         return ResponseEntity.status(202).body(apiResponse);
     }
 
@@ -68,7 +88,7 @@ public class UserController {
         UserResponse response = userService.UpdateUserById(userId , request);
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setData(response);
-        apiResponse.setStatusCode("00");
+        apiResponse.setStatusCode(true);
         apiResponse.setMessage("updates successfully");
         return ResponseEntity.status(202).body(apiResponse);
 

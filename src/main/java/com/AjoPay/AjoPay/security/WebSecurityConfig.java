@@ -11,73 +11,45 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.net.http.HttpRequest;
-
-@Configuration //  use in starting new springboot
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
-    // setting beans
-    // overriding default implementation
-    // spring security is majorly Authentication and Authorization
-    private final PasswordEncoder passwordEncoder;
+public class WebSecurityConfig {
     private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
     private final CustomAuthenticationFilter authenticationFilter;
-
-    // Authentication
-//    @Bean
-//    public UserDetailsService userDetailsService(){
-//        UserDetails idris = User.withUsername("idris")
-//                .password(passwordEncoder.encode("12345"))
-//                .roles("ADMIN")
-//                .build();
-//        return new InMemoryUserDetailsManager(idris);
-//    }
-    // Encoding password Authentication
-
-
-    // Authorization
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        return http.headers().frameOptions().disable().and()
+                .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/**").permitAll() // permit client to register
+                .requestMatchers("/auth/**").permitAll()
                 .and()
-                .authorizeHttpRequests().requestMatchers("/user/** ")// if any client is comming in its should authenticate it self
+                .authorizeHttpRequests().requestMatchers("/user/**")
                 .authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class )
-                .build(); // use it to login new client
-
-
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
-
-    // JWT ---> Generate Token and Validate token
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
+
     }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-
 }

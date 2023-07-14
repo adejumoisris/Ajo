@@ -18,19 +18,24 @@ public class User extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+    private String username;
     private String firstName;
     private String lastName;
 
     private String email;
-    private int phoneNumber;
+    private String phoneNumber;
+
+    private String role;
 
     private String password;
 
-    private String confirmPassword;
+//    private String confirmPassword;
 
     private String gender;
 
-    private String role;
+    private Boolean isVerified = false;
+
+
 
     // Auditing
 

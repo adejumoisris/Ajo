@@ -18,6 +18,8 @@ public interface UserService {
 
    public UserResponse UpdateUserById(Long userId, UserRequestDto request);
 
+    String verifyAccount(String token);
+
 
     // Creating All users
 
