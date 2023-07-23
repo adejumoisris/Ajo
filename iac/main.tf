@@ -34,8 +34,40 @@ module "ajopay-vpc"{
   create_database_subnet_route_table     = true
   #create_database_internet_gateway_route = true
 
-  ##NAT Gateway - Outbound flow for private subnet
+  ##NAT Gateway - Outbound flow for the private subnet
   enable_nat_gateway = true
   single_nat_gateway = true
+
+
+# VPC DNS parameters
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  public_subnet_tags{
+    Name = "ajopay-public-subnets"
+  }
+
+  private_subnet_tags{
+    Name = "ajopay-private-subnets"
+  }
+
+  database_subnet_tags{
+    Name = "ajopay-database-subnets"
+  }
+
+  tags ={
+    Owner = "Ajopay"
+    Team = "development"
+    Environment = "dev"
+
+  }
+
+  
+  vpc_tags = {
+    Name = "ajopay-vpc"
+  }
+
+
  }
+
+
 
