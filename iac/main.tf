@@ -56,6 +56,7 @@ module "ajopay-vpc"{
 
   tags ={
     Owner = "Ajopay"
+    Team = "development"
     Environment = "dev"
 
   }
