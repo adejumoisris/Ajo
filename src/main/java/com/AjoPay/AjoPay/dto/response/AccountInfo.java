@@ -3,17 +3,16 @@ package com.AjoPay.AjoPay.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
 @Builder
-public class UserResponse {
+@AllArgsConstructor
+@NoArgsConstructor
+public class AccountInfo {
     private String firstName;
-    private String lastName;
-    private String email;
-
-//    private BigDecimal accountBalance;
     private String accountNumber;
+    private BigDecimal accountBalance;
 }
