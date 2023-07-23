@@ -21,7 +21,7 @@ public class UserRequestDto {
 //    @Min(11)
 //    @Max(11)
     private String phoneNumber;
-    private String role;
+
 
 //    private String password;
 //

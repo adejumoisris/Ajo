@@ -7,6 +7,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
@@ -27,11 +28,15 @@ import java.util.concurrent.CompletableFuture;
 public class SendMailServiceImpl implements SendMailService {
     private final JavaMailSender mailSender; // autowiring mail sender
 
+    @Value("ajopay554@gmail.com")
+    private String senderEmail;
+
     @Async
     public void sendMail(EmailDto emailDto) {
         log.info("sending mail, building mail ");
         MimeMessagePreparator mimeMessagePreparator = mimeMessage -> {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
+            mimeMessageHelper.setFrom(senderEmail);
             mimeMessageHelper.setFrom(emailDto.getSender());
             mimeMessageHelper.setTo(emailDto.getRecipient());
             mimeMessageHelper.setSubject(emailDto.getSubject());
@@ -60,7 +65,7 @@ public class SendMailServiceImpl implements SendMailService {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
 
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-        mimeMessageHelper.setFrom("idrisadejumo@gmail.com");
+        mimeMessageHelper.setFrom("ajopay554@gmail.com");
         mimeMessageHelper.setTo(emailDto.getRecipient());
         mimeMessageHelper.setSubject(emailDto.getSubject());
         mimeMessageHelper.setText(emailDto.getBody());

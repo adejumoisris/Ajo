@@ -1,7 +1,9 @@
 package com.AjoPay.AjoPay.controller;
 
+import com.AjoPay.AjoPay.dto.request.TransferRequest;
 import com.AjoPay.AjoPay.dto.request.UserRequestDto;
 import com.AjoPay.AjoPay.dto.response.ApiResponse;
+import com.AjoPay.AjoPay.dto.response.BankResponse;
 import com.AjoPay.AjoPay.dto.response.UserResponse;
 import com.AjoPay.AjoPay.exceptions.UserNotFoundException;
 import com.AjoPay.AjoPay.model.User;
@@ -92,6 +94,12 @@ public class UserController {
         apiResponse.setMessage("updates successfully");
         return ResponseEntity.status(202).body(apiResponse);
 
+    }
+    // <<<<<----------Transfer Endpoint------------------->>>>>>>>>>>>>>>
+
+    @PostMapping("transfer")
+    public BankResponse transfer(@RequestBody TransferRequest request){
+        return userService.transfer(request);
     }
 
 

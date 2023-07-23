@@ -1,7 +1,9 @@
 package com.AjoPay.AjoPay.service.serviceImplementation;
 
 import com.AjoPay.AjoPay.dto.request.EmailDto;
+import com.AjoPay.AjoPay.dto.request.TransferRequest;
 import com.AjoPay.AjoPay.dto.request.UserRequestDto;
+import com.AjoPay.AjoPay.dto.response.BankResponse;
 import com.AjoPay.AjoPay.dto.response.UserResponse;
 import com.AjoPay.AjoPay.exceptions.CustomException;
 import com.AjoPay.AjoPay.exceptions.ResourceNotFoundException;
@@ -12,6 +14,7 @@ import com.AjoPay.AjoPay.repository.UserRepo;
 import com.AjoPay.AjoPay.repository.VerificationTokenRepository;
 import com.AjoPay.AjoPay.service.SendMailService;
 import com.AjoPay.AjoPay.service.UserService;
+import com.AjoPay.AjoPay.utilis.AccountUtils;
 import com.auth0.jwt.interfaces.Verification;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -46,19 +49,26 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
         user.setEmail(request.getEmail());
+        user.setAccountNumber(AccountUtils.generateAccountNumber()); // this is auto generated account Number
         user.setGender(request.getGender());
         user.setUsername(request.getUsername());
-        user.setRole(request.getRole());
+
         user.setPhoneNumber(request.getPhoneNumber());
         log.info("about saving");
 
         User saveUser = userRepo.save(user);
         log.info("save user");
+        EmailDto emailDto = EmailDto.builder()
+                .recipient(saveUser.getEmail())
+                .subject("ACCOUNT CREATION")
+                .message(" Congratulation your account have been created Successfully " + " " + saveUser.getFirstName() + " " + saveUser.getLastName() )
+                .build();
+        sendMailService.sendMail(emailDto);
         return new UserResponse(
                 saveUser.getFirstName(),
                 saveUser.getLastName(),
                 saveUser.getEmail(),
-                saveUser.getPassword()
+                saveUser.getAccountNumber()
 
                 );
     }
@@ -135,6 +145,62 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             return fetchUserAndEnable(verificationToken.get());
         }
         throw new CustomException("token invalid");
+    }
+    // Transferring Money from one Bank to Anothere
+
+    @Override
+    public BankResponse transfer(TransferRequest request) {
+        User sourceAccountUser = userRepo.findByAccountNumber(request.getSourceAccountNumber());
+        // check if u have sufficient amount to transffer
+        if (request.getAmount().compareTo(sourceAccountUser.getAccountBalance()) > 0){
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.INSUFFICIENT_BALANCE_CODE)
+                    .responseMessage(AccountUtils.INSUFFICIENT_BALANCE_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+
+        // if there is available money perform the debit deduction
+        // this is where we are performing the deduction
+
+        sourceAccountUser.setAccountBalance(sourceAccountUser.getAccountBalance().subtract(request.getAmount()));
+        String sourceUserName = sourceAccountUser.getFirstName() + " " + sourceAccountUser.getLastName() + " " + sourceAccountUser.getUsername();
+        userRepo.save(sourceAccountUser);
+
+        // sending debit alert to the source Account
+
+        EmailDto debitAlert = EmailDto.builder()
+                .subject("DEBIT ALERT")
+                .recipient(sourceAccountUser.getEmail())
+                .message("The sum of " + request.getAmount() + " has been deducted from your account! your current Balance is " + sourceAccountUser.getAccountBalance())
+                .build();
+
+        sendMailService.sendMail(debitAlert);
+
+        // crediting the destination account
+        User destinationAccountUser = userRepo.findByAccountNumber(request.getDestinationAccountNumber());
+        destinationAccountUser.setAccountBalance(destinationAccountUser.getAccountBalance().add(request.getAmount()));
+        userRepo.save(destinationAccountUser);
+        // sending credit  alert to the destinationAccount account
+
+        EmailDto creditAlert = EmailDto.builder()
+                .subject("CREDIT ALERT")
+                .recipient(sourceAccountUser.getEmail())
+                .message("The sum of " + request.getAmount() + " has been transfer to your account! your current Balance is " + sourceAccountUser.getAccountBalance())
+                .build();
+
+        sendMailService.sendMail(creditAlert);
+
+        return BankResponse.builder()
+                .responseCode(AccountUtils.TRANSFER_SUCCESSFUL_CODE)
+                .responseMessage(AccountUtils.TRANSFER_SUCCESSFUL_MESSAGE)
+                .build();
+
+
+
+
+        
+
     }
 
 

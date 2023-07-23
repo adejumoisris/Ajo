@@ -13,6 +13,7 @@ public class EmailDto {
 
     private String subject;
     private String recipient;
+    private String message;
     private String body;
     private String sender;
     private String attachment;
