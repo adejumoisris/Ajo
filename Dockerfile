@@ -34,4 +34,4 @@ COPY --from=maven_build /app/${JAR_FILE} .
 
 EXPOSE ${PORT}
 
-ENTRYPOINT ["java", "-jar", "AjoPay-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=prod"]
+ENTRYPOINT ["java", "-jar", "AjoPay-0.0.1-SNAPSHOT.jar"]
