@@ -9,7 +9,7 @@ RUN apt-get update && \
 #WORKDIR /app
 COPY . .
 RUN mvn clean install
-FROM openjdk-17-jdk
+#FROM openjdk-17-jdk
 EXPOSE 2020
 COPY —from-build build/libs/Ajo-0.0.1-SNAPSHOT.jar ajo.jar
 ENTRYPOINT  ["java", "-jar", “ajo.jar”]
